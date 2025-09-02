@@ -1,6 +1,8 @@
 #include <SFML/Graphics.hpp>
 #include <thread>
 #include <iostream>
+#include "xoshiro256ss.h"
+#include <random>
 
 const unsigned int GRID_WIDTH = 20u;
 const unsigned int GRID_HEIGHT = 20u;
@@ -8,9 +10,34 @@ const unsigned int GRID_HEIGHT = 20u;
 const unsigned int SCREEN_WIDTH = 1920u;
 const unsigned int SCREEN_HEIGHT = 1080u;
 
-typedef sf::RectangleShape gridType[GRID_WIDTH][GRID_HEIGHT];
+using u64 = unsigned long long;
 
-void buildGrid(sf::RenderWindow &window, gridType &grid, float size, float border, float lineweight) {
+enum squareState {
+    DEAD,
+    DYING,
+    ALIVE,
+    GROWING
+};
+
+struct gridSquare {
+    sf::RectangleShape render_obj;
+    squareState state;
+    float capacity;
+
+};
+
+double getU01(xoshiro256ss &g) {
+    u64 base = g();
+    u64 max = u64 (-1);
+    double uniform = double(base) / double(max);
+
+    return uniform;
+}
+
+
+typedef struct gridSquare gridType[GRID_WIDTH][GRID_HEIGHT];
+
+void buildGrid(xoshiro256ss g, gridType &grid, float size, float border, float lineweight) {
 
 
     for (int x = 0; x < GRID_WIDTH; x++) {
@@ -22,8 +49,18 @@ void buildGrid(sf::RenderWindow &window, gridType &grid, float size, float borde
             sf::RectangleShape shape = sf::RectangleShape({size, size});
             shape.setFillColor(sf::Color::White);
             shape.setPosition({x_base, y_base});
-            grid[x][y] = shape;
 
+            gridSquare tmp_struct;
+            if(getU01(g) <= .25) {
+                tmp_struct.state = DEAD;
+                shape.setFillColor(sf::Color::Red);
+            } else {
+                tmp_struct.state = ALIVE;
+                shape.setFillColor(sf::Color::Green);
+            }
+            tmp_struct.render_obj = shape;
+            tmp_struct.capacity = 50.f;
+            grid[x][y] = tmp_struct;
         }
     }
     
@@ -34,13 +71,17 @@ void drawGrid(sf::RenderWindow &window, gridType &grid) {
     
     for (int x = 0; x < GRID_WIDTH; x++) {
         for (int y = 0; y < GRID_HEIGHT; y++) {
-            sf::RectangleShape shape = grid[x][y];
+            sf::RectangleShape shape = grid[x][y].render_obj;
             window.draw(shape);
            
         }
     }
     
     return;
+}
+
+void updateGrid(gridType &grid, xoshiro256ss g) {
+    
 }
 
 
@@ -50,12 +91,17 @@ int main()
 
     auto window = sf::RenderWindow(sf::VideoMode({1920u, 1080u}), "Gridworld");
     window.setFramerateLimit(144);
+    srand(time(0));
+    xoshiro256ss g(rand());
+    
+    
+
 
     std::cout << "Initializing Grid.\n";
     gridType grid;
 
     std::cout << "Building Grid.\n";
-    buildGrid(window, grid, 50, 10, 2);
+    buildGrid(g, grid, 50, 10, 2);
     std::cout << "Grid Build Successful.\n";
 
     while (window.isOpen())
