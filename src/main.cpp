@@ -34,17 +34,17 @@ void buildGrid(xoshiro256ss g, gridType &grid, float size, float border, float l
             shape.setPosition({x_base, y_base});
 
             int log_pos[2] = {x,y};
-            gridSquare tmp_struct = gridSquare();
+            gridSquare cell = gridSquare();
             if(getU01(g) <= .25) {
-                tmp_struct.state = DEAD;
+                cell.state = DEAD;
                 shape.setFillColor(sf::Color::Red);
             } else {
-                tmp_struct.state = ALIVE;
+                cell.state = ALIVE;
                 shape.setFillColor(sf::Color::Green);
             }
-            tmp_struct.shape = shape;
-            tmp_struct.capacity = 50.f;
-            grid[x][y] = tmp_struct;
+            cell.shape = shape;
+            cell.capacity = 50.f;
+            grid[x][y] = cell;
         }
     }
     

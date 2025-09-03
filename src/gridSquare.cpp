@@ -9,5 +9,6 @@ class gridSquare {
     squareState state;
     float capacity;
 
+    int parent_ptr;
 };
 
