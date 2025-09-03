@@ -15,13 +15,17 @@ enum squareState {
 
 class gridSquare {
 public:
-    // gridSquare(sf::RectangleShape shape, squareState state, float capacity, int log_pos[2]);
-    // gridSquare(int log_pos[2]);
-    // gridSquare();
+    std::array<gridSquare, 4> &getNeighbors();
+    int addNeighbor(gridSquare* cell);
 public:
     int log_pos[2];
     sf::RectangleShape shape;
     squareState state;
     float capacity;
+
+
+
+
+
 
 };

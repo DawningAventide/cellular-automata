@@ -9,6 +9,14 @@ class gridSquare {
     squareState state;
     float capacity;
 
-    int parent_ptr;
-};
 
+
+    std::vector<gridSquare*> neighbors;
+
+    int addNeighbor(gridSquare* cell) {
+        neighbors.push_back(cell);
+        return 0;
+    }
+
+
+};

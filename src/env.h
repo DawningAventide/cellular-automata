@@ -14,21 +14,8 @@ private:
 
 
 public:
-    gridSquare* getCell(unsigned int x, unsigned int y) {
-        if(x < GRID_WIDTH && y < GRID_HEIGHT) {
-            return &grid[x][y];
-        } else {
-            std::cout << "Error: Get Index out of bounds.";
-            throw(x, y);
-        }
-    };
+    gridSquare* getCell(unsigned int x, unsigned int y);
 
-    void addCell(unsigned int x, unsigned int y, gridSquare cell) {
-        if(x < GRID_WIDTH && y < GRID_HEIGHT) {
-            grid[x][y] = cell;
-        } else {
-            std::cout << "Error: Add Index out of bounds.";
-        }
-    };
+    void addCell(unsigned int x, unsigned int y, gridSquare cell) ;
 
 };
