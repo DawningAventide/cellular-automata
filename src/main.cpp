@@ -1,30 +1,14 @@
 #include <SFML/Graphics.hpp>
-#include <thread>
 #include <iostream>
 #include "xoshiro256ss.h"
 #include <random>
+#include "gridSquare.h"
 
-const unsigned int GRID_WIDTH = 20u;
-const unsigned int GRID_HEIGHT = 20u;
 
-const unsigned int SCREEN_WIDTH = 1920u;
-const unsigned int SCREEN_HEIGHT = 1080u;
 
 using u64 = unsigned long long;
 
-enum squareState {
-    DEAD,
-    DYING,
-    ALIVE,
-    GROWING
-};
-
-struct gridSquare {
-    sf::RectangleShape render_obj;
-    squareState state;
-    float capacity;
-
-};
+typedef gridSquare gridType[GRID_WIDTH][GRID_HEIGHT];
 
 double getU01(xoshiro256ss &g) {
     u64 base = g();
@@ -35,7 +19,6 @@ double getU01(xoshiro256ss &g) {
 }
 
 
-typedef struct gridSquare gridType[GRID_WIDTH][GRID_HEIGHT];
 
 void buildGrid(xoshiro256ss g, gridType &grid, float size, float border, float lineweight) {
 
@@ -50,7 +33,8 @@ void buildGrid(xoshiro256ss g, gridType &grid, float size, float border, float l
             shape.setFillColor(sf::Color::White);
             shape.setPosition({x_base, y_base});
 
-            gridSquare tmp_struct;
+            int log_pos[2] = {x,y};
+            gridSquare tmp_struct = gridSquare();
             if(getU01(g) <= .25) {
                 tmp_struct.state = DEAD;
                 shape.setFillColor(sf::Color::Red);
@@ -58,7 +42,7 @@ void buildGrid(xoshiro256ss g, gridType &grid, float size, float border, float l
                 tmp_struct.state = ALIVE;
                 shape.setFillColor(sf::Color::Green);
             }
-            tmp_struct.render_obj = shape;
+            tmp_struct.shape = shape;
             tmp_struct.capacity = 50.f;
             grid[x][y] = tmp_struct;
         }
@@ -71,7 +55,7 @@ void drawGrid(sf::RenderWindow &window, gridType &grid) {
     
     for (int x = 0; x < GRID_WIDTH; x++) {
         for (int y = 0; y < GRID_HEIGHT; y++) {
-            sf::RectangleShape shape = grid[x][y].render_obj;
+            sf::RectangleShape shape = grid[x][y].shape;
             window.draw(shape);
            
         }
@@ -81,7 +65,7 @@ void drawGrid(sf::RenderWindow &window, gridType &grid) {
 }
 
 void updateGrid(gridType &grid, xoshiro256ss g) {
-    
+
 }
 
 
@@ -101,7 +85,7 @@ int main()
     gridType grid;
 
     std::cout << "Building Grid.\n";
-    buildGrid(g, grid, 50, 10, 2);
+    buildGrid(g, grid, SQUARE_SIZE, BORDER_SIZE, LINE_WEIGHT);
     std::cout << "Grid Build Successful.\n";
 
     while (window.isOpen())
